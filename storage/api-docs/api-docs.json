@@ -1,0 +1,324 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "CDN API",
+        "description": "Simple CDN backend for storing and serving image and video files.",
+        "contact": {
+            "email": "admin@duuuuardo.xyz"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/upload/image": {
+            "post": {
+                "tags": ["Images"],
+                "summary": "Upload an image",
+                "description": "Stores the uploaded image and returns its public URL. Accepted formats: jpg, jpeg, png, gif, webp, svg. Max 10 MB.",
+                "operationId": "0ca20371419d3adc9ebcf155ac6c01ed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["file"],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Image uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "a1b2c3d4.jpg"
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "example": "http://localhost:8000/storage/images/a1b2c3d4.jpg"
+                                        },
+                                        "size": {
+                                            "type": "integer",
+                                            "example": 204800
+                                        },
+                                        "mime": {
+                                            "type": "string",
+                                            "example": "image/jpeg"
+                                        },
+                                        "uploaded_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyHeader": []
+                    }
+                ]
+            }
+        },
+        "/api/upload/video": {
+            "post": {
+                "tags": ["Videos"],
+                "summary": "Upload a video",
+                "description": "Stores the uploaded video and returns its public URL. Accepted formats: mp4, webm, ogg, mov, avi, mkv. Max 500 MB.",
+                "operationId": "a5b39db1c780cc5b3ce3e748832ec771",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["file"],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Video uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "e5f6a7b8.mp4"
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "example": "http://localhost:8000/storage/videos/e5f6a7b8.mp4"
+                                        },
+                                        "size": {
+                                            "type": "integer",
+                                            "example": 104857600
+                                        },
+                                        "mime": {
+                                            "type": "string",
+                                            "example": "video/mp4"
+                                        },
+                                        "uploaded_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyHeader": []
+                    }
+                ]
+            }
+        },
+        "/api/files": {
+            "get": {
+                "tags": ["Files"],
+                "summary": "List all uploaded files",
+                "description": "Returns a paginated list of all images and videos. Use the 'type' filter to narrow results.",
+                "operationId": "c0fb4b0c3438a40584378def08f964a7",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by type: 'images' or 'videos'",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["images", "videos"]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (default 20, max 100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File listing",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "images",
+                                                            "videos"
+                                                        ]
+                                                    },
+                                                    "url": {
+                                                        "type": "string"
+                                                    },
+                                                    "size": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "page": {
+                                            "type": "integer"
+                                        },
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "total_pages": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/files/{type}/{name}": {
+            "delete": {
+                "tags": ["Files"],
+                "summary": "Delete a file",
+                "description": "Permanently removes a file from CDN storage.",
+                "operationId": "6819fc1bc63ef80a1e786d12487c4f92",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "File type: 'images' or 'videos'",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["images", "videos"]
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "File name returned on upload",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File deleted."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "File not found"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyHeader": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyHeader": {
+                "type": "apiKey",
+                "name": "X-CDN-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Images",
+            "description": "Images"
+        },
+        {
+            "name": "Videos",
+            "description": "Videos"
+        },
+        {
+            "name": "Files",
+            "description": "Files"
+        }
+    ]
+}
